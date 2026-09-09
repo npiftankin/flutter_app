@@ -1,69 +1,71 @@
-import 'package:flutter/material.dart';
+enum Grade {
+  excellent,
+  good,
+  satisfactory,
+  bad,
+}
+
+class Student {
+  String name;
+  int score;
+
+  Student(this.name, this.score);
+
+  Grade getGrade() {
+    if (score >= 90) {
+      return Grade.excellent;
+    } else if (score >= 75) {
+      return Grade.good;
+    } else if (score >= 60) {
+      return Grade.satisfactory;
+    } else {
+      return Grade.bad;
+    }
+  }
+
+  void printInfo() {
+    print('$name: $score баллов, оценка: ${getGrade().title}');
+  }
+}
+
+extension GradeExtension on Grade {
+  String get title {
+    switch (this) {
+      case Grade.excellent:
+        return 'Отлично';
+      case Grade.good:
+        return 'Хорошо';
+      case Grade.satisfactory:
+        return 'Удовлетворительно';
+      case Grade.bad:
+        return 'Плохо';
+    }
+  }
+}
+
+Future<void> loadStudents() async {
+  await Future.delayed(const Duration(seconds: 10));
+
+  List<Student> students = [
+    Student('Анна', 95),
+    Student('Иван', 82),
+    Student('Мария', 67),
+    Student('Пётр', 45),
+  ];
+
+  print('Список студентов:');
+
+  for (Student student in students) {
+    student.printInfo();
+  }
+
+  print('\nСтуденты, набравшие больше 70 баллов:');
+
+  students
+      .where((student) => student.score > 70)
+      .forEach((student) => print(student.name));
+}
 
 void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-    @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-                                                                                                                                colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Пифтанкин Н. А. ПИбд-31'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-      
-        
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-                                    _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-                            return Scaffold(
-      appBar: AppBar(
-                                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                        title: Text(widget.title),
-      ),
-      body: Center(
-                        child: Column(
-                                                                                                                                            mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
+  loadStudents();
 }
