@@ -101,7 +101,9 @@ class _CardState extends State<_Card> {
         decoration: BoxDecoration(
           color: Colors.white70,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.grey),
+          border: Border.all(
+            color: Colors.grey,
+          ),
           boxShadow: const [
             BoxShadow(
               color: Colors.redAccent,
@@ -123,11 +125,13 @@ class _CardState extends State<_Card> {
                 child: Image.network(
                   widget.imageUrl ?? '',
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                  const Placeholder(),
+                  errorBuilder: (_, __, ___) {
+                    return const Placeholder();
+                  },
                 ),
               ),
             ),
+
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -139,20 +143,43 @@ class _CardState extends State<_Card> {
                       Theme.of(context).textTheme.headlineSmall,
                     ),
                   ),
+
                   Icon(widget.icon),
+
                   const SizedBox(width: 12),
+
                   GestureDetector(
                     onTap: () {
                       setState(() {
                         isLiked = !isLiked;
                       });
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isLiked
+                                ? '${widget.text} добавлено в избранное'
+                                : '${widget.text} удалено из избранного',
+                          ),
+                          backgroundColor: Colors.deepPurple,
+                          duration:
+                          const Duration(seconds: 1),
+                        ),
+                      );
                     },
-                    child: Icon(
-                      isLiked
-                          ? Icons.favorite
-                          : Icons.favorite_border,
-                      color:
-                      isLiked ? Colors.amber : null,
+                    child: AnimatedSwitcher(
+                      duration:
+                      const Duration(milliseconds: 200),
+                      child: isLiked
+                          ? const Icon(
+                        Icons.favorite,
+                        color: Colors.amber,
+                        key: ValueKey<int>(0),
+                      )
+                          : const Icon(
+                        Icons.favorite_border,
+                        key: ValueKey<int>(1),
+                      ),
                     ),
                   ),
                 ],
