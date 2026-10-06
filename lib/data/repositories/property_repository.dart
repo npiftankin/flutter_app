@@ -21,8 +21,13 @@ class PropertyRepository extends ApiInterface {
 
       final Response<List<dynamic>> response = await _dio.get<List<dynamic>>(
         url,
-        // значения null Dio в запрос не добавляет
-        queryParameters: {'type': type, 'maxPrice': maxPrice},
+        // Dio превращает null в пустой параметр (?type), а backend
+        // воспринимает его как фильтр с пустым значением, поэтому
+        // незаданные параметры в запрос не добавляем
+        queryParameters: {
+          'type': ?type,
+          'maxPrice': ?maxPrice,
+        },
       );
 
       final List<PropertyDto> dto = (response.data ?? [])
