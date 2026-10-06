@@ -65,6 +65,10 @@ class _BodyState extends State<Body> {
     setState(() => _price = value);
 
     Debounce.run(() {
+      if (!mounted) {
+        return;
+      }
+
       final bloc = context.read<HomeBloc>();
       bloc.add(HomeLoadDataEvent(type: bloc.state.type, maxPrice: _maxPrice));
     });
