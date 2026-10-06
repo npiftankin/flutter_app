@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/components/utils/debounce.dart';
 import 'package:flutter_app/domain/models/card.dart';
 import 'package:flutter_app/presentation/common/status_label.dart';
 import 'package:flutter_app/presentation/details_page/details_page.dart';
@@ -60,10 +61,21 @@ class _BodyState extends State<Body> {
   }
 
   void _onPriceChanged(double value) {
+    // ползунок двигается сразу, а запрос уходит, когда пользователь остановился
     setState(() => _price = value);
 
+    Debounce.run(() {
+      final bloc = context.read<HomeBloc>();
+      bloc.add(HomeLoadDataEvent(type: bloc.state.type, maxPrice: _maxPrice));
+    });
+  }
+
+  Future<void> _onRefresh() async {
     final bloc = context.read<HomeBloc>();
-    bloc.add(HomeLoadDataEvent(type: bloc.state.type, maxPrice: _maxPrice));
+    bloc.add(HomeLoadDataEvent(type: bloc.state.type, maxPrice: bloc.state.maxPrice));
+
+    // индикатор обновления крутится, пока блок не закончит загрузку
+    await bloc.stream.firstWhere((state) => !state.isLoading);
   }
 
   @override
@@ -130,23 +142,28 @@ class _BodyState extends State<Body> {
   Widget _buildList(HomeState state) {
     final List<CardData>? items = state.data?.data;
 
-    if (items == null) {
-      return const SizedBox.shrink();
-    }
-    if (items.isEmpty) {
-      return const Center(child: Text('Ничего не найдено'));
-    }
+    // список всегда прокручиваемый, иначе пустой экран нельзя потянуть для обновления
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: items == null ? 0 : (items.isEmpty ? 1 : items.length),
+        itemBuilder: (context, index) {
+          if (items == null || items.isEmpty) {
+            return const Padding(
+              padding: EdgeInsets.all(32),
+              child: Center(child: Text('Ничего не найдено')),
+            );
+          }
 
-    return ListView.builder(
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final CardData item = items[index];
-        return _Card(
-          item,
-          onTap: () =>
-              Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(item))),
-        );
-      },
+          final CardData item = items[index];
+          return _Card(
+            item,
+            onTap: () =>
+                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(item))),
+          );
+        },
+      ),
     );
   }
 }
