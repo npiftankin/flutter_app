@@ -70,6 +70,11 @@ class _BodyState extends State<Body> {
     });
   }
 
+  void _onRetry() {
+    final bloc = context.read<HomeBloc>();
+    bloc.add(HomeLoadDataEvent(type: bloc.state.type, maxPrice: bloc.state.maxPrice));
+  }
+
   Future<void> _onRefresh() async {
     final bloc = context.read<HomeBloc>();
     bloc.add(HomeLoadDataEvent(type: bloc.state.type, maxPrice: bloc.state.maxPrice));
@@ -127,9 +132,14 @@ class _BodyState extends State<Body> {
             if (state.error != null)
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: Text(
-                  state.error ?? '',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.red),
+                child: Column(
+                  children: [
+                    Text(
+                      state.error ?? '',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.red),
+                    ),
+                    TextButton(onPressed: _onRetry, child: const Text('Повторить')),
+                  ],
                 ),
               ),
             Expanded(child: _buildList(state)),
