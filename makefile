@@ -3,3 +3,6 @@ gen:
 
 format:
 	dart format . --line-length 100
+
+icon:
+	flutter pub run flutter_launcher_icons:main
