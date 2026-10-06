@@ -50,10 +50,8 @@ class _BodyState extends State<Body> {
   String? _type;
   double _price = _sliderMax;
 
-  // номер последнего запроса: ответы на устаревшие запросы игнорируются
   int _requestId = 0;
 
-  // крайнее правое положение ползунка означает отсутствие ограничения
   int? get _maxPrice => _price >= _sliderMax ? null : _price.round();
 
   @override
