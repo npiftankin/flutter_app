@@ -17,7 +17,6 @@ void main() {
   runApp(const MyApp());
 }
 
-// Язык системы, если он не поддерживается, то русский
 Locale _defaultLocale() {
   final Locale system = PlatformDispatcher.instance.locale;
   return AppLocale.supportedLocales.firstWhere(

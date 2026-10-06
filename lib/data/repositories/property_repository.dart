@@ -21,9 +21,6 @@ class PropertyRepository extends ApiInterface {
 
       final Response<List<dynamic>> response = await _dio.get<List<dynamic>>(
         url,
-        // Dio превращает null в пустой параметр (?type), а backend
-        // воспринимает его как фильтр с пустым значением, поэтому
-        // незаданные параметры в запрос не добавляем
         queryParameters: {'type': ?type, 'maxPrice': ?maxPrice},
       );
 
@@ -37,7 +34,6 @@ class PropertyRepository extends ApiInterface {
     }
   }
 
-  // Backend отвечает на ошибки телом {"status": ..., "message": ...}
   String? _errorMessage(DioException e) {
     final data = e.response?.data;
     if (data is Map<String, dynamic> && data['message'] is String) {

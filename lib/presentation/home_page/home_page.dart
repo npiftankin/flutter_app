@@ -71,7 +71,6 @@ class Body extends StatefulWidget {
 class _BodyState extends State<Body> {
   double _price = _sliderMax;
 
-  // крайнее правое положение ползунка означает отсутствие ограничения
   int? get _maxPrice => _price >= _sliderMax ? null : _price.round();
 
   @override
@@ -89,7 +88,6 @@ class _BodyState extends State<Body> {
   }
 
   void _onPriceChanged(double value) {
-    // ползунок двигается сразу, а запрос уходит, когда пользователь остановился
     setState(() => _price = value);
 
     Debounce.run(() {
@@ -111,7 +109,6 @@ class _BodyState extends State<Body> {
     context.read<LikeBloc>().add(ChangeLikeEvent(id));
 
     final String message = isLiked ? context.locale.disliked : context.locale.liked;
-    // новое сообщение сразу заменяет предыдущее, а не ждёт в очереди
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -131,7 +128,6 @@ class _BodyState extends State<Body> {
     final bloc = context.read<HomeBloc>();
     bloc.add(HomeLoadDataEvent(type: bloc.state.type, maxPrice: bloc.state.maxPrice));
 
-    // индикатор обновления крутится, пока блок не закончит загрузку
     await bloc.stream.firstWhere((state) => !state.isLoading);
   }
 
@@ -191,8 +187,6 @@ class _BodyState extends State<Body> {
   Widget _buildList(HomeState state) {
     final List<CardData> items = state.data?.data ?? [];
 
-    // ошибка и сообщение о пустом списке лежат внутри списка, поэтому не ломают
-    // высоту экрана, а сам список всегда прокручиваемый для обновления потягиванием
     final bool hasError = state.error != null;
     final bool showEmpty = state.data != null && items.isEmpty;
     final int offset = hasError ? 1 : 0;

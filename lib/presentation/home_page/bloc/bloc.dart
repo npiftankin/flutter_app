@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final ApiInterface repo;
 
-  // номер последнего запроса: ответы на устаревшие запросы игнорируются
   int _requestId = 0;
 
   HomeBloc(this.repo) : super(const HomeState()) {

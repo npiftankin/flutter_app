@@ -12,7 +12,6 @@ extension PropertyStatusLabel on PropertyStatus {
   };
 }
 
-// Тип приходит с сервера на русском: известные типы переводим, остальные показываем как есть
 String typeLabel(BuildContext context, String? type) => switch (type) {
   'Квартира' => context.locale.typeApartment,
   'Дом' => context.locale.typeHouse,
