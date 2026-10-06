@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/components/utils/debounce.dart';
 import 'package:flutter_app/domain/models/card.dart';
-import 'package:flutter_app/presentation/common/status_label.dart';
+import 'package:flutter_app/presentation/common/labels.dart';
+import 'package:flutter_app/components/extensions/context_x.dart';
 import 'package:flutter_app/presentation/details_page/details_page.dart';
 import 'package:flutter_app/presentation/home_page/bloc/bloc.dart';
 import 'package:flutter_app/presentation/home_page/bloc/events.dart';
@@ -101,13 +102,13 @@ class _BodyState extends State<Body> {
                 spacing: 8,
                 children: [
                   ChoiceChip(
-                    label: const Text('Все'),
+                    label: Text(context.locale.all),
                     selected: state.type == null,
                     onSelected: (_) => _onTypeSelected(null),
                   ),
                   ..._types.map(
                     (type) => ChoiceChip(
-                      label: Text(type),
+                      label: Text(typeLabel(context, type)),
                       selected: state.type == type,
                       onSelected: (_) => _onTypeSelected(type),
                     ),
@@ -120,7 +121,7 @@ class _BodyState extends State<Body> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  maxPrice == null ? 'Любая цена' : 'До $maxPrice ₽ в сутки',
+                  maxPrice == null ? context.locale.anyPrice : context.locale.priceUpTo(maxPrice),
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ),
@@ -142,7 +143,7 @@ class _BodyState extends State<Body> {
                       state.error ?? '',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.red),
                     ),
-                    TextButton(onPressed: _onRetry, child: const Text('Повторить')),
+                    TextButton(onPressed: _onRetry, child: Text(context.locale.retry)),
                   ],
                 ),
               ),
@@ -164,9 +165,9 @@ class _BodyState extends State<Body> {
         itemCount: items == null ? 0 : (items.isEmpty ? 1 : items.length),
         itemBuilder: (context, index) {
           if (items == null || items.isEmpty) {
-            return const Padding(
-              padding: EdgeInsets.all(32),
-              child: Center(child: Text('Ничего не найдено')),
+            return Padding(
+              padding: const EdgeInsets.all(32),
+              child: Center(child: Text(context.locale.nothingFound)),
             );
           }
 

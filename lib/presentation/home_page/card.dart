@@ -70,8 +70,8 @@ class _CardState extends State<_Card> {
                             SnackBar(
                               content: Text(
                                 isLiked
-                                    ? '${data.text} добавлено в избранное'
-                                    : '${data.text} удалено из избранного',
+                                    ? '${data.text} ${context.locale.liked}'
+                                    : '${data.text} ${context.locale.disliked}',
                               ),
                               backgroundColor: Colors.deepPurple,
                               duration: const Duration(seconds: 1),
@@ -93,14 +93,19 @@ class _CardState extends State<_Card> {
                   ),
                   const SizedBox(height: 4),
                   if (data.status != null)
-                    Text(data.status?.label ?? '', style: Theme.of(context).textTheme.labelLarge),
+                    Text(
+                      data.status?.label(context) ?? '',
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
                   Text(
-                    '${data.type ?? ''} • ${data.area ?? '-'} м² • ${data.pricePerDay ?? '-'} ₽ / сутки',
+                    '${typeLabel(context, data.type)} • ${data.area ?? '-'} ${context.locale.squareMeters} • ${data.pricePerDay ?? '-'} ${context.locale.perDay}',
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
-                  Text('Район: ${data.districtName ?? 'Не указан'}'),
                   Text(
-                    'Агент: ${data.agentName == null ? 'Не указан' : '${data.agentName} (${data.agentPhone})'}',
+                    '${context.locale.district}: ${data.districtName ?? context.locale.notSpecified}',
+                  ),
+                  Text(
+                    '${context.locale.agent}: ${data.agentName == null ? context.locale.notSpecified : '${data.agentName} (${data.agentPhone})'}',
                   ),
                   const SizedBox(height: 8),
                   Text(data.descriptionText),

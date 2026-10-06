@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/domain/models/card.dart';
-import 'package:flutter_app/presentation/common/status_label.dart';
+import 'package:flutter_app/presentation/common/labels.dart';
+import 'package:flutter_app/components/extensions/context_x.dart';
 
 class DetailsPage extends StatelessWidget {
   final CardData data;
@@ -41,18 +42,21 @@ class DetailsPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (data.status != null)
-                    Text(data.status?.label ?? '', style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      data.status?.label(context) ?? '',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                   Text(
-                    '${data.type ?? ''} • ${data.area ?? '-'} м² • ${data.pricePerDay ?? '-'} ₽ / сутки',
+                    '${typeLabel(context, data.type)} • ${data.area ?? '-'} ${context.locale.squareMeters} • ${data.pricePerDay ?? '-'} ${context.locale.perDay}',
                     style: const TextStyle(fontSize: 18),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Район: ${data.districtName ?? 'Не указан'}',
+                    '${context.locale.district}: ${data.districtName ?? context.locale.notSpecified}',
                     style: const TextStyle(fontSize: 18),
                   ),
                   Text(
-                    'Агент: ${data.agentName == null ? 'Не указан' : '${data.agentName} (${data.agentPhone})'}',
+                    '${context.locale.agent}: ${data.agentName == null ? context.locale.notSpecified : '${data.agentName} (${data.agentPhone})'}',
                     style: const TextStyle(fontSize: 18),
                   ),
                   const SizedBox(height: 16),

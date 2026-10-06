@@ -1,0 +1,31 @@
+{
+  "@@locale": "en",
+
+  "all": "All",
+  "typeApartment": "Apartment",
+  "typeHouse": "House",
+  "typeOffice": "Office",
+  "anyPrice": "Any price",
+  "priceUpTo": "Up to {price} ₽ per day",
+  "@priceUpTo": {
+    "placeholders": {
+      "price": {"type": "int"}
+    }
+  },
+  "retry": "Retry",
+  "nothingFound": "Nothing found",
+  "perDay": "₽ / day",
+  "squareMeters": "m²",
+  "district": "District",
+  "agent": "Agent",
+  "notSpecified": "Not specified",
+  "statusDraft": "Draft",
+  "statusModeration": "Under moderation",
+  "statusActive": "Published",
+  "statusSuspended": "Suspended",
+  "statusArchived": "Archived",
+  "liked": "added to favorites",
+  "disliked": "removed from favorites",
+
+  "arbEnding": "Reminder: no trailing comma above :)"
+}

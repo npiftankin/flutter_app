@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/components/locale/l10n/app_locale.dart';
 import 'package:flutter_app/data/repositories/api_interface.dart';
 import 'package:flutter_app/data/repositories/property_repository.dart';
 import 'package:flutter_app/presentation/home_page/bloc/bloc.dart';
@@ -16,6 +17,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      localizationsDelegates: AppLocale.localizationsDelegates,
+      supportedLocales: AppLocale.supportedLocales,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
       home: RepositoryProvider<ApiInterface>(

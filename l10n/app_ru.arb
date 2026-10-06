@@ -1,0 +1,31 @@
+{
+  "@@locale": "ru",
+
+  "all": "Все",
+  "typeApartment": "Квартира",
+  "typeHouse": "Дом",
+  "typeOffice": "Офис",
+  "anyPrice": "Любая цена",
+  "priceUpTo": "До {price} ₽ в сутки",
+  "@priceUpTo": {
+    "placeholders": {
+      "price": {"type": "int"}
+    }
+  },
+  "retry": "Повторить",
+  "nothingFound": "Ничего не найдено",
+  "perDay": "₽ / сутки",
+  "squareMeters": "м²",
+  "district": "Район",
+  "agent": "Агент",
+  "notSpecified": "Не указан",
+  "statusDraft": "Черновик",
+  "statusModeration": "На модерации",
+  "statusActive": "Опубликовано",
+  "statusSuspended": "Приостановлено",
+  "statusArchived": "В архиве",
+  "liked": "добавлено в избранное",
+  "disliked": "удалено из избранного",
+
+  "arbEnding": "Чтобы не забыть про отсутствие запятой :)"
+}
