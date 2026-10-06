@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/components/config.dart';
 import 'package:flutter_app/data/dtos/properties_dto.dart';
 import 'package:flutter_app/domain/models/card.dart';
 import 'package:flutter_app/domain/models/home.dart';
@@ -14,7 +13,7 @@ extension PropertyDtoToModel on PropertyDto {
     title ?? 'UNKNOWN',
     descriptionText: description ?? '',
     icon: _iconByType(type),
-    imageUrl: _resolveImage(image),
+    imageUrl: image,
     id: id,
     type: type,
     area: area,
@@ -24,18 +23,6 @@ extension PropertyDtoToModel on PropertyDto {
     agentName: agent?.name,
     agentPhone: agent?.phone,
   );
-
-  // Ссылки вида http... берём как есть, пути вида /1.jpg
-  // отдаёт веб-клиент, поэтому дописываем его адрес.
-  String? _resolveImage(String? image) {
-    if (image == null || image.isEmpty) {
-      return null;
-    }
-    if (image.startsWith('http')) {
-      return image;
-    }
-    return Uri.parse(imagesBaseUrl).resolve(image).toString();
-  }
 
   IconData _iconByType(String? type) => switch (type) {
     'Квартира' => Icons.apartment,

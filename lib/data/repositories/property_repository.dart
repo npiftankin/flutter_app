@@ -24,10 +24,7 @@ class PropertyRepository extends ApiInterface {
         // Dio превращает null в пустой параметр (?type), а backend
         // воспринимает его как фильтр с пустым значением, поэтому
         // незаданные параметры в запрос не добавляем
-        queryParameters: {
-          'type': ?type,
-          'maxPrice': ?maxPrice,
-        },
+        queryParameters: {'type': ?type, 'maxPrice': ?maxPrice},
       );
 
       final List<PropertyDto> dto = (response.data ?? [])
