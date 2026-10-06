@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/data/repositories/api_interface.dart';
-import 'package:flutter_app/data/repositories/property_repository.dart';
 import 'package:flutter_app/domain/models/card.dart';
-import 'package:flutter_app/domain/models/home.dart';
 import 'package:flutter_app/presentation/common/status_label.dart';
 import 'package:flutter_app/presentation/details_page/details_page.dart';
-
+import 'package:flutter_app/presentation/home_page/bloc/bloc.dart';
+import 'package:flutter_app/presentation/home_page/bloc/events.dart';
+import 'package:flutter_app/presentation/home_page/bloc/state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 part 'card.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -41,17 +41,7 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  final ApiInterface _repo = PropertyRepository();
-
-  HomeData? _data;
-  bool _isLoading = false;
-  String? _error;
-
-  String? _type;
   double _price = _sliderMax;
-
-  // номер последнего запроса: ответы на устаревшие запросы игнорируются
-  int _requestId = 0;
 
   // крайнее правое положение ползунка означает отсутствие ограничения
   int? get _maxPrice => _price >= _sliderMax ? null : _price.round();
@@ -59,102 +49,86 @@ class _BodyState extends State<Body> {
   @override
   void initState() {
     super.initState();
-    _load();
-  }
 
-  Future<void> _load() async {
-    final int requestId = ++_requestId;
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    String? error;
-    final HomeData? data = await _repo.loadData(
-      type: _type,
-      maxPrice: _maxPrice,
-      onError: (e) => error = e,
-    );
-
-    if (!mounted || requestId != _requestId) {
-      return;
-    }
-    setState(() {
-      _data = data ?? _data;
-      _error = error;
-      _isLoading = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<HomeBloc>().add(const HomeLoadDataEvent());
     });
   }
 
   void _onTypeSelected(String? type) {
-    setState(() => _type = type);
-    _load();
+    context.read<HomeBloc>().add(HomeLoadDataEvent(type: type, maxPrice: _maxPrice));
   }
 
   void _onPriceChanged(double value) {
     setState(() => _price = value);
-    _load();
+
+    final bloc = context.read<HomeBloc>();
+    bloc.add(HomeLoadDataEvent(type: bloc.state.type, maxPrice: _maxPrice));
   }
 
   @override
   Widget build(BuildContext context) {
     final int? maxPrice = _maxPrice;
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-          child: Wrap(
-            spacing: 8,
-            children: [
-              ChoiceChip(
-                label: const Text('Все'),
-                selected: _type == null,
-                onSelected: (_) => _onTypeSelected(null),
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, state) {
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: Wrap(
+                spacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text('Все'),
+                    selected: state.type == null,
+                    onSelected: (_) => _onTypeSelected(null),
+                  ),
+                  ..._types.map(
+                    (type) => ChoiceChip(
+                      label: Text(type),
+                      selected: state.type == type,
+                      onSelected: (_) => _onTypeSelected(type),
+                    ),
+                  ),
+                ],
               ),
-              ..._types.map(
-                (type) => ChoiceChip(
-                  label: Text(type),
-                  selected: _type == type,
-                  onSelected: (_) => _onTypeSelected(type),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  maxPrice == null ? 'Любая цена' : 'До $maxPrice ₽ в сутки',
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              maxPrice == null ? 'Любая цена' : 'До $maxPrice ₽ в сутки',
-              style: Theme.of(context).textTheme.bodyLarge,
             ),
-          ),
-        ),
-        Slider(
-          value: _price,
-          min: _sliderMin,
-          max: _sliderMax,
-          divisions: 19,
-          onChanged: _onPriceChanged,
-        ),
-        if (_isLoading) const LinearProgressIndicator(),
-        if (_error != null)
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              _error ?? '',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.red),
+            Slider(
+              value: _price,
+              min: _sliderMin,
+              max: _sliderMax,
+              divisions: 19,
+              onChanged: _onPriceChanged,
             ),
-          ),
-        Expanded(child: _buildList()),
-      ],
+            if (state.isLoading) const LinearProgressIndicator(),
+            if (state.error != null)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  state.error ?? '',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.red),
+                ),
+              ),
+            Expanded(child: _buildList(state)),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildList() {
-    final List<CardData>? items = _data?.data;
+  Widget _buildList(HomeState state) {
+    final List<CardData>? items = state.data?.data;
 
     if (items == null) {
       return const SizedBox.shrink();
