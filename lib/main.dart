@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      home: const MyHomePage(title: 'Пифтанкин Н. А. ПИбд-31'),
+      home: const MyHomePage(title: 'CityHome'),
     );
   }
 }
