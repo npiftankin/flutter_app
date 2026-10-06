@@ -8,6 +8,9 @@ import 'package:flutter_app/presentation/home_page/bloc/bloc.dart';
 import 'package:flutter_app/presentation/home_page/bloc/events.dart';
 import 'package:flutter_app/presentation/home_page/bloc/state.dart';
 import 'package:flutter_app/presentation/common/svg_objects.dart';
+import 'package:flutter_app/presentation/like_bloc/like_bloc.dart';
+import 'package:flutter_app/presentation/like_bloc/like_event.dart';
+import 'package:flutter_app/presentation/like_bloc/like_state.dart';
 import 'package:flutter_app/presentation/locale_bloc/locale_bloc.dart';
 import 'package:flutter_app/presentation/locale_bloc/locale_events.dart';
 import 'package:flutter_app/presentation/locale_bloc/locale_state.dart';
@@ -77,6 +80,7 @@ class _BodyState extends State<Body> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<HomeBloc>().add(const HomeLoadDataEvent());
+      context.read<LikeBloc>().add(const LoadLikesEvent());
     });
   }
 
@@ -96,6 +100,26 @@ class _BodyState extends State<Body> {
       final bloc = context.read<HomeBloc>();
       bloc.add(HomeLoadDataEvent(type: bloc.state.type, maxPrice: _maxPrice));
     });
+  }
+
+  void _onLike(CardData data, bool isLiked) {
+    final int? id = data.id;
+    if (id == null) {
+      return;
+    }
+
+    context.read<LikeBloc>().add(ChangeLikeEvent(id));
+
+    final String message = isLiked ? context.locale.disliked : context.locale.liked;
+    // новое сообщение сразу заменяет предыдущее, а не ждёт в очереди
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${data.text} $message'),
+        backgroundColor: Colors.deepPurple,
+        duration: const Duration(seconds: 1),
+      ),
+    );
   }
 
   void _onRetry() {
@@ -173,41 +197,49 @@ class _BodyState extends State<Body> {
     final bool showEmpty = state.data != null && items.isEmpty;
     final int offset = hasError ? 1 : 0;
 
-    return RefreshIndicator(
-      onRefresh: _onRefresh,
-      child: ListView.builder(
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: offset + (showEmpty ? 1 : items.length),
-        itemBuilder: (context, index) {
-          if (hasError && index == 0) {
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Text(
-                    state.error ?? '',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.red),
+    return BlocBuilder<LikeBloc, LikeState>(
+      builder: (context, likeState) {
+        return RefreshIndicator(
+          onRefresh: _onRefresh,
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: offset + (showEmpty ? 1 : items.length),
+            itemBuilder: (context, index) {
+              if (hasError && index == 0) {
+                return Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Text(
+                        state.error ?? '',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.red),
+                      ),
+                      TextButton(onPressed: _onRetry, child: Text(context.locale.retry)),
+                    ],
                   ),
-                  TextButton(onPressed: _onRetry, child: Text(context.locale.retry)),
-                ],
-              ),
-            );
-          }
-          if (showEmpty) {
-            return Padding(
-              padding: const EdgeInsets.all(32),
-              child: Center(child: Text(context.locale.nothingFound)),
-            );
-          }
+                );
+              }
+              if (showEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Center(child: Text(context.locale.nothingFound)),
+                );
+              }
 
-          final CardData item = items[index - offset];
-          return _Card(
-            item,
-            onTap: () =>
-                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(item))),
-          );
-        },
-      ),
+              final CardData item = items[index - offset];
+              return _Card(
+                item,
+                onLike: _onLike,
+                isLiked: likeState.likedIds.contains(item.id),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DetailsPage(item)),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

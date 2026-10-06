@@ -1,24 +1,19 @@
 part of 'home_page.dart';
 
-class _Card extends StatefulWidget {
+typedef OnLikeCallback = void Function(CardData data, bool isLiked)?;
+
+class _Card extends StatelessWidget {
   final CardData data;
   final VoidCallback? onTap;
+  final OnLikeCallback onLike;
+  final bool isLiked;
 
-  const _Card(this.data, {this.onTap});
-
-  @override
-  State<_Card> createState() => _CardState();
-}
-
-class _CardState extends State<_Card> {
-  bool isLiked = false;
+  const _Card(this.data, {this.onTap, this.onLike, this.isLiked = false});
 
   @override
   Widget build(BuildContext context) {
-    final CardData data = widget.data;
-
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: onTap,
       child: Container(
         margin: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -61,23 +56,7 @@ class _CardState extends State<_Card> {
                       Icon(data.icon),
                       const SizedBox(width: 12),
                       GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            isLiked = !isLiked;
-                          });
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                isLiked
-                                    ? '${data.text} ${context.locale.liked}'
-                                    : '${data.text} ${context.locale.disliked}',
-                              ),
-                              backgroundColor: Colors.deepPurple,
-                              duration: const Duration(seconds: 1),
-                            ),
-                          );
-                        },
+                        onTap: () => onLike?.call(data, isLiked),
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 200),
                           child: isLiked
