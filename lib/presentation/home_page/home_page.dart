@@ -44,7 +44,6 @@ class Body extends StatefulWidget {
 class _BodyState extends State<Body> {
   double _price = _sliderMax;
 
-  // крайнее правое положение ползунка означает отсутствие ограничения
   int? get _maxPrice => _price >= _sliderMax ? null : _price.round();
 
   @override
@@ -61,7 +60,6 @@ class _BodyState extends State<Body> {
   }
 
   void _onPriceChanged(double value) {
-    // ползунок двигается сразу, а запрос уходит, когда пользователь остановился
     setState(() => _price = value);
 
     Debounce.run(() {
@@ -83,7 +81,6 @@ class _BodyState extends State<Body> {
     final bloc = context.read<HomeBloc>();
     bloc.add(HomeLoadDataEvent(type: bloc.state.type, maxPrice: bloc.state.maxPrice));
 
-    // индикатор обновления крутится, пока блок не закончит загрузку
     await bloc.stream.firstWhere((state) => !state.isLoading);
   }
 
@@ -156,7 +153,6 @@ class _BodyState extends State<Body> {
   Widget _buildList(HomeState state) {
     final List<CardData>? items = state.data?.data;
 
-    // список всегда прокручиваемый, иначе пустой экран нельзя потянуть для обновления
     return RefreshIndicator(
       onRefresh: _onRefresh,
       child: ListView.builder(
