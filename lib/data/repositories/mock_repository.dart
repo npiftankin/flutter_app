@@ -6,19 +6,14 @@ import 'package:flutter_app/domain/models/property_status.dart';
 
 class MockRepository extends ApiInterface {
   @override
-  Future<HomeData?> loadData({
-    OnErrorCallback? onError,
-    String? type,
-    int? maxPrice,
-  }) async {
+  Future<HomeData?> loadData({OnErrorCallback? onError, String? type, int? maxPrice}) async {
     return HomeData(
       data: [
         CardData(
           'Дом',
           descriptionText: 'Большой загородный дом с участком.',
           icon: Icons.home,
-          imageUrl:
-              'https://m.terem-pro.ru/upload/iblock/27c/27cd22f5560e08e5e7e106370c0cdf8b.jpg',
+          imageUrl: 'https://m.terem-pro.ru/upload/iblock/27c/27cd22f5560e08e5e7e106370c0cdf8b.jpg',
           id: 1,
           type: 'Дом',
           area: 120,

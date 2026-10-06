@@ -11,19 +11,19 @@ extension PropertiesDtoToModel on List<PropertyDto> {
 
 extension PropertyDtoToModel on PropertyDto {
   CardData toDomain() => CardData(
-        title ?? 'UNKNOWN',
-        descriptionText: description ?? '',
-        icon: _iconByType(type),
-        imageUrl: _resolveImage(image),
-        id: id,
-        type: type,
-        area: area,
-        pricePerDay: pricePerDay,
-        status: PropertyStatus.fromServer(status),
-        districtName: district?.name,
-        agentName: agent?.name,
-        agentPhone: agent?.phone,
-      );
+    title ?? 'UNKNOWN',
+    descriptionText: description ?? '',
+    icon: _iconByType(type),
+    imageUrl: _resolveImage(image),
+    id: id,
+    type: type,
+    area: area,
+    pricePerDay: pricePerDay,
+    status: PropertyStatus.fromServer(status),
+    districtName: district?.name,
+    agentName: agent?.name,
+    agentPhone: agent?.phone,
+  );
 
   // Ссылки вида http... берём как есть, пути вида /1.jpg
   // отдаёт веб-клиент, поэтому дописываем его адрес.
@@ -38,9 +38,9 @@ extension PropertyDtoToModel on PropertyDto {
   }
 
   IconData _iconByType(String? type) => switch (type) {
-        'Квартира' => Icons.apartment,
-        'Дом' => Icons.home,
-        'Офис' => Icons.business,
-        _ => Icons.home_work,
-      };
+    'Квартира' => Icons.apartment,
+    'Дом' => Icons.home,
+    'Офис' => Icons.business,
+    _ => Icons.home_work,
+  };
 }

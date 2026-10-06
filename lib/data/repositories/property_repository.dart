@@ -12,27 +12,17 @@ class PropertyRepository extends ApiInterface {
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
     ),
-  )..interceptors.add(PrettyDioLogger(
-      requestHeader: true,
-      requestBody: true,
-    ));
+  )..interceptors.add(PrettyDioLogger(requestHeader: true, requestBody: true));
 
   @override
-  Future<HomeData?> loadData({
-    OnErrorCallback? onError,
-    String? type,
-    int? maxPrice,
-  }) async {
+  Future<HomeData?> loadData({OnErrorCallback? onError, String? type, int? maxPrice}) async {
     try {
       const String url = '$apiBaseUrl/properties';
 
       final Response<List<dynamic>> response = await _dio.get<List<dynamic>>(
         url,
         // значения null Dio в запрос не добавляет
-        queryParameters: {
-          'type': type,
-          'maxPrice': maxPrice,
-        },
+        queryParameters: {'type': type, 'maxPrice': maxPrice},
       );
 
       final List<PropertyDto> dto = (response.data ?? [])

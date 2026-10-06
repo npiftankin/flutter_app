@@ -18,15 +18,11 @@ PropertyDto _$PropertyDtoFromJson(Map<String, dynamic> json) => PropertyDto(
   district: json['district'] == null
       ? null
       : DistrictDto.fromJson(json['district'] as Map<String, dynamic>),
-  agent: json['agent'] == null
-      ? null
-      : AgentDto.fromJson(json['agent'] as Map<String, dynamic>),
+  agent: json['agent'] == null ? null : AgentDto.fromJson(json['agent'] as Map<String, dynamic>),
 );
 
-DistrictDto _$DistrictDtoFromJson(Map<String, dynamic> json) => DistrictDto(
-  id: (json['id'] as num?)?.toInt(),
-  name: json['name'] as String?,
-);
+DistrictDto _$DistrictDtoFromJson(Map<String, dynamic> json) =>
+    DistrictDto(id: (json['id'] as num?)?.toInt(), name: json['name'] as String?);
 
 AgentDto _$AgentDtoFromJson(Map<String, dynamic> json) => AgentDto(
   id: (json['id'] as num?)?.toInt(),

@@ -6,11 +6,11 @@ enum PropertyStatus {
   archived;
 
   static PropertyStatus? fromServer(String? value) => switch (value) {
-        'DRAFT' => PropertyStatus.draft,
-        'MODERATION' => PropertyStatus.moderation,
-        'ACTIVE' => PropertyStatus.active,
-        'SUSPENDED' => PropertyStatus.suspended,
-        'ARCHIVED' => PropertyStatus.archived,
-        _ => null,
-      };
+    'DRAFT' => PropertyStatus.draft,
+    'MODERATION' => PropertyStatus.moderation,
+    'ACTIVE' => PropertyStatus.active,
+    'SUSPENDED' => PropertyStatus.suspended,
+    'ARCHIVED' => PropertyStatus.archived,
+    _ => null,
+  };
 }
