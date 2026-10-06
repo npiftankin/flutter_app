@@ -39,16 +39,16 @@ class DetailsPage extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
-                  Icon(
-                    icon,
-                    size: 40,
-                  ),
-                  const SizedBox(width: 16),
                   Text(
                     text,
                     style:
                     Theme.of(context).textTheme.headlineLarge,
                   ),
+                  Icon(
+                    icon,
+                    size: 40,
+                  ),
+                  const SizedBox(width: 16),
                 ],
               ),
             ),
