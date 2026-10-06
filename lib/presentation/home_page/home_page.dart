@@ -7,6 +7,10 @@ import 'package:flutter_app/presentation/details_page/details_page.dart';
 import 'package:flutter_app/presentation/home_page/bloc/bloc.dart';
 import 'package:flutter_app/presentation/home_page/bloc/events.dart';
 import 'package:flutter_app/presentation/home_page/bloc/state.dart';
+import 'package:flutter_app/presentation/common/svg_objects.dart';
+import 'package:flutter_app/presentation/locale_bloc/locale_bloc.dart';
+import 'package:flutter_app/presentation/locale_bloc/locale_events.dart';
+import 'package:flutter_app/presentation/locale_bloc/locale_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 part 'card.dart';
 
@@ -25,7 +29,26 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: _color, title: Text(widget.title)),
+      appBar: AppBar(
+        backgroundColor: _color,
+        title: Text(widget.title),
+        actions: [
+          GestureDetector(
+            onTap: () => context.read<LocaleBloc>().add(const ChangeLocaleEvent()),
+            child: SizedBox.square(
+              dimension: 40,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: BlocBuilder<LocaleBloc, LocaleState>(
+                  builder: (context, state) {
+                    return state.currentLocale.languageCode == 'ru' ? const SvgRu() : const SvgUk();
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: const Body(),
     );
   }
@@ -134,19 +157,6 @@ class _BodyState extends State<Body> {
               onChanged: _onPriceChanged,
             ),
             if (state.isLoading) const LinearProgressIndicator(),
-            if (state.error != null)
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Text(
-                      state.error ?? '',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.red),
-                    ),
-                    TextButton(onPressed: _onRetry, child: Text(context.locale.retry)),
-                  ],
-                ),
-              ),
             Expanded(child: _buildList(state)),
           ],
         );
@@ -155,23 +165,42 @@ class _BodyState extends State<Body> {
   }
 
   Widget _buildList(HomeState state) {
-    final List<CardData>? items = state.data?.data;
+    final List<CardData> items = state.data?.data ?? [];
 
-    // список всегда прокручиваемый, иначе пустой экран нельзя потянуть для обновления
+    // ошибка и сообщение о пустом списке лежат внутри списка, поэтому не ломают
+    // высоту экрана, а сам список всегда прокручиваемый для обновления потягиванием
+    final bool hasError = state.error != null;
+    final bool showEmpty = state.data != null && items.isEmpty;
+    final int offset = hasError ? 1 : 0;
+
     return RefreshIndicator(
       onRefresh: _onRefresh,
       child: ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: items == null ? 0 : (items.isEmpty ? 1 : items.length),
+        itemCount: offset + (showEmpty ? 1 : items.length),
         itemBuilder: (context, index) {
-          if (items == null || items.isEmpty) {
+          if (hasError && index == 0) {
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Text(
+                    state.error ?? '',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.red),
+                  ),
+                  TextButton(onPressed: _onRetry, child: Text(context.locale.retry)),
+                ],
+              ),
+            );
+          }
+          if (showEmpty) {
             return Padding(
               padding: const EdgeInsets.all(32),
               child: Center(child: Text(context.locale.nothingFound)),
             );
           }
 
-          final CardData item = items[index];
+          final CardData item = items[index - offset];
           return _Card(
             item,
             onTap: () =>
